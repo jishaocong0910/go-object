@@ -7,7 +7,10 @@ require (
 	golang.org/x/text v0.14.0
 )
 
-retract v1.0.0
+retract (
+	v1.0.0
+	v1.0.1
+)
 
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect

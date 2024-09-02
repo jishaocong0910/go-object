@@ -440,26 +440,26 @@ func main() {
 
 枚举值和枚举集合都不需要构造函数，`o.NewEnum`函数已包装了统一逻辑。
 
-判断枚举相等应比较`<枚举值>.Id == <枚举值>.Id`，不要直接比较`<枚举值> == <枚举值>`，switch语法也应使用`<枚举值>.Id`作为条件。
+判断枚举相等应比较`<枚举值>.ID() == <枚举值>.ID()`，不要直接比较`<枚举值> == <枚举值>`，switch语法也应使用`<枚举值>.ID()`作为条件。
 
 建议使用单独文件声明枚举以区分普通Go代码，枚举值和枚举集合都在统一文件，文件名格式为`<枚举名>.enum.go`。
 
-*o.M_EnumValue成员*
+*o.M_EnumValue方法*
 
-| 成员              | 说明                                       |
-| ----------------- | ------------------------------------------ |
-| Id（字段）        | 在枚举集合中的ID，值为在枚举集合的字段名。 |
-| Undefined（方法） | 返回该枚举值是否存在。                     |
+| 方法        | 说明                     |
+|-----------|------------------------|
+| Id        | 在枚举集合中的ID，值为在枚举集合的字段名。 |
+| Undefined | 返回该枚举值是否存在。            |
 
-*o.M_Enum成员*
+*o.M_Enum方法*
 
-| 成员                   | 说明                                                         |
-| ---------------------- | ------------------------------------------------------------ |
-| Values（字段）         | 所有枚举值，一般用于自定义枚举查找。                         |
-| OfId（方法）           | 根据ID查找枚举值，ID为枚举字段名称。                         |
-| OfIdIgnoreCase（方法） | 根据ID查找枚举值，不区分大小写。                             |
-| Is（方法）             | 判断目标枚举值是否等于源枚举值，多个目标枚举则只需满足其中一个，如果两个枚举值`Undefined`方法都返回true，则认为相等。 |
-| Not（方法）            | 与`Is`方法相反。                                             |
+| 方法             | 说明                                                                 |
+|----------------|--------------------------------------------------------------------|
+| Values         | 所有枚举值，一般用于自定义枚举查找。                                                 |
+| OfId           | 根据ID查找枚举值，ID为枚举字段名称。                                               |
+| OfIdIgnoreCase | 根据ID查找枚举值，不区分大小写。                                                  |
+| Is             | 判断目标枚举值是否等于源枚举值，多个目标枚举则只需满足其中一个，如果两个枚举值`Undefined`方法都返回true，则认为相等。 |
+| Not            | 与`Is`方法相反。                                                         |
 
 *示例代码*
 
@@ -486,7 +486,7 @@ type _DbType struct {
 
 // 自定义查找方法（接受者不需要指针，名称不需要为this）
 func (d _DbType) OfName(name string) (result DbType) {
-    for _, t := range d.Values {
+    for _, t := range d.Values() {
         if t.Name == name {
             result = t
             break
@@ -505,15 +505,15 @@ var DbTypes = o.NewEnum[DbType](_DbType{
 
 func main() {
     d := DbTypes.MYSQL
-    fmt.Println(d.Id)
-    fmt.Println(DbTypes.OfIdIgnoreCase("sqlserver").Id)
+    fmt.Println(d.ID())
+    fmt.Println(DbTypes.OfIdIgnoreCase("sqlserver").ID())
     // Output:
     // MYSQL
     // SQLSERVER
 
     d2 := DbTypes.OfName("MySQL")
     fmt.Println(d2.Undefined())
-    fmt.Println(d.Id == d2.Id)
+    fmt.Println(d.ID() == d2.ID())
     // Output:
     // false
     // true
@@ -523,14 +523,14 @@ func main() {
     // Output:
     // true
 
-    switch d.Id {
-    case DbTypes.MYSQL.Id:
+    switch d.ID() {
+    case DbTypes.MYSQL.ID():
         fmt.Println("mysql")
-    case DbTypes.ORACLE.Id:
+    case DbTypes.ORACLE.ID():
         fmt.Println("oracle")
-    case DbTypes.SQLSERVER.Id:
+    case DbTypes.SQLSERVER.ID():
         fmt.Println("sqlserver")
-    case DbTypes.POSTFRES.Id:
+    case DbTypes.POSTFRES.ID():
         fmt.Println("postgresql")
     }
 }

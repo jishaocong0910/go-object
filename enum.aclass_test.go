@@ -26,9 +26,9 @@ func TestEnum(t *testing.T) {
 	r.True(enum.Is(enum.OfId("cat"), enum.cat))
 	r.True(enum.Is(enum.OfId("DOG"), enum.DOG))
 	r.True(enum.Is(enum.OfId("bird"), enum.bird))
-	r.Equal("cat", enum.cat.Id)
-	r.Equal("DOG", enum.DOG.Id)
-	r.Equal("bird", enum.bird.Id)
+	r.Equal("cat", enum.cat.ID())
+	r.Equal("DOG", enum.DOG.ID())
+	r.Equal("bird", enum.bird.ID())
 	r.True(enum.Is(enum.cat, enum.cat, enum.DOG))
 	r.False(enum.Is(enum.cat, enum.bird, enum.DOG))
 	r.True(enum.Not(enum.cat, enum.bird, enum.DOG))
@@ -37,6 +37,12 @@ func TestEnum(t *testing.T) {
 	r.True(enum.OfIdIgnoreCase("SNAKE").Undefined())
 	r.True(enum.OfId("BIRD").Undefined())
 	r.False(enum.OfIdIgnoreCase("BIRD").Undefined())
+
+	values := enum.Values()
+	r.Len(values, 3)
+
+	a := Animal{}
+	r.Equal("", a.ID())
 }
 
 func TestEnumPanic(t *testing.T) {

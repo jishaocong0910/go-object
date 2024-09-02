@@ -5,11 +5,19 @@ type i_EnumValue interface {
 }
 
 type M_EnumValue struct {
-	Id string
+	id string
 }
 
 func (this *M_EnumValue) m_092ACD12CAAC() *M_EnumValue {
 	return this
+}
+
+func (this *M_EnumValue) ID() string {
+	var id string
+	if this != nil {
+		id = this.id
+	}
+	return id
 }
 
 func (this *M_EnumValue) Undefined() bool {

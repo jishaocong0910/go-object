@@ -12,39 +12,53 @@ type i_Enum[V i_EnumValue] interface {
 }
 
 type M_Enum[V i_EnumValue] struct {
-	Values []V
-	IdMap  map[string]V
+	values []V
+	idMap  map[string]V
 }
 
 func (this *M_Enum[V]) m_e8c96b0197f2() *M_Enum[V] {
 	return this
 }
 
+func (this *M_Enum[V]) Values() []V {
+	var result []V
+	if this != nil {
+		result = this.values
+	}
+	return result
+}
+
 func (this *M_Enum[V]) OfId(id string) (value V) {
-	if v, ok := this.IdMap[id]; ok {
-		value = v
+	if this != nil {
+		if v, ok := this.idMap[id]; ok {
+			value = v
+		}
 	}
 	return
 }
 
 func (this *M_Enum[V]) OfIdIgnoreCase(id string) (value V) {
-	for _, v := range this.Values {
-		if strings.EqualFold(v.m_092ACD12CAAC().Id, id) {
-			return v
+	if this != nil {
+		for _, v := range this.values {
+			if strings.EqualFold(v.m_092ACD12CAAC().id, id) {
+				return v
+			}
 		}
 	}
 	return
 }
 
 func (this *M_Enum[V]) Is(source V, targets ...V) bool {
-	for _, t := range targets {
-		if source.m_092ACD12CAAC().Undefined() {
-			if t.m_092ACD12CAAC().Undefined() {
-				return true
-			}
-		} else if !t.m_092ACD12CAAC().Undefined() {
-			if t.m_092ACD12CAAC().Id == source.m_092ACD12CAAC().Id {
-				return true
+	if this != nil {
+		for _, t := range targets {
+			if source.m_092ACD12CAAC().Undefined() {
+				if t.m_092ACD12CAAC().Undefined() {
+					return true
+				}
+			} else if !t.m_092ACD12CAAC().Undefined() {
+				if t.m_092ACD12CAAC().id == source.m_092ACD12CAAC().id {
+					return true
+				}
 			}
 		}
 	}
@@ -91,16 +105,16 @@ func NewEnum[V i_EnumValue, E i_Enum[V]](e E) E {
 		}
 
 		mEv := value.m_092ACD12CAAC()
-		mEv.Id = tf.Name
+		mEv.id = tf.Name
 
 		mE := e.m_e8c96b0197f2()
-		mE.Values = append(mE.Values, value)
+		mE.values = append(mE.values, value)
 	}
 
 	mE := e.m_e8c96b0197f2()
-	mE.IdMap = make(map[string]V, len(mE.Values))
-	for _, value := range mE.Values {
-		mE.IdMap[value.m_092ACD12CAAC().Id] = value
+	mE.idMap = make(map[string]V, len(mE.values))
+	for _, value := range mE.values {
+		mE.idMap[value.m_092ACD12CAAC().id] = value
 	}
 
 	return v.Interface().(E)
