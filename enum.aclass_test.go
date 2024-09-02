@@ -3,7 +3,7 @@ package o_test
 import (
 	"testing"
 
-	. "github.com/jishaocong9010/go-object"
+	. "github.com/jishaocong0910/go-object"
 	"github.com/stretchr/testify/require"
 )
 

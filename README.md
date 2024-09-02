@@ -469,7 +469,7 @@ package main
 import (
     "fmt"
 
-    o "github.com/jishaocong9010/go-object"
+    o "github.com/jishaocong0910/go-object"
 )
 
 // 枚举值
@@ -556,7 +556,7 @@ package main
 import (
     "fmt"
 
-    o "github.com/jishaocong9010/go-object"
+    o "github.com/jishaocong0910/go-object"
 )
 
 func main() {
