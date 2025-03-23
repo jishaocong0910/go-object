@@ -5,7 +5,7 @@ func extendMap[K comparable, V any](i i_Map[K, V]) *m_Map[K, V] {
 }
 
 type i_Map[K comparable, V any] interface {
-	m_8CC656601595() *m_Map[K, V]
+	m_Map() *m_Map[K, V]
 	key(K) K
 }
 
@@ -14,7 +14,7 @@ type m_Map[K comparable, V any] struct {
 	m map[K]*Entry[K, V]
 }
 
-func (this *m_Map[K, V]) m_8CC656601595() *m_Map[K, V] {
+func (this *m_Map[K, V]) m_Map() *m_Map[K, V] {
 	return this
 }
 
@@ -27,7 +27,7 @@ func (this *m_Map[K, V]) Put(k K, v V) {
 }
 
 func (this *m_Map[K, V]) PutAll(other i_Map[K, V]) {
-	for k, v := range other.m_8CC656601595().m {
+	for k, v := range other.m_Map().m {
 		this.m[this.i.key(k)] = v
 	}
 }

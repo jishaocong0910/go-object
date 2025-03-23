@@ -1,14 +1,14 @@
 package o
 
 type i_EnumValue interface {
-	m_092ACD12CAAC() *M_EnumValue
+	m_EnumValue() *M_EnumValue
 }
 
 type M_EnumValue struct {
 	id string
 }
 
-func (this *M_EnumValue) m_092ACD12CAAC() *M_EnumValue {
+func (this *M_EnumValue) m_EnumValue() *M_EnumValue {
 	return this
 }
 
