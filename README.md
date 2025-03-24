@@ -16,9 +16,9 @@
 
 ***抽象类***由***抽象接口***和***抽象成员***组成，***抽象接口***是一个接口，***抽象成员***是一个结构体，它们是一个整体相辅相成。
 
-***抽象接口***是**抽象类**的代表，多态关系的父类表现形式（go-object风格的多态关系实际为Golang接口的实现关系），还用于声明子类必须实现的方法和可重写方法。声明方式：名称格式为`I_<类名>`，必须声明一个用于转化为***抽象成员***的方法，称为***父类成员方法***，名称格式为：`M<类名>`，无参数，返回***抽象成员***指针。
+***抽象接口***是**抽象类**的代表，多态关系的父类表现形式（go-object风格的多态关系实际为Golang接口的实现关系），还用于声明子类必须实现的方法和可重写方法。声明方式：名称格式为`I_<类名>`，必须声明一个用于转化为***抽象成员***的方法，称为***父类成员方法***，名称格式为：`M_<类名>_`，无参数，返回***抽象成员***指针。
 
-***抽象成员***用于存放**抽象类**的成员变量和方法，即使没有成员变量或方法，也需要定义它，方便以后扩展。声明方式：名称格式为`M_<类名>`，必须声明一个***抽象接口***的字段`I`，称为***子类对象字段***，还需实现***父类成员方法***，实现逻辑为将本身指针返回。
+***抽象成员***用于存放**抽象类**的成员变量和方法，即使没有成员变量或方法，也需要定义它，方便以后扩展。声明方式：名称格式为`M_<类名>`（与***父类成员方法***相差一个下划线，原因是避免编译错误），必须声明一个***抽象接口***的字段`I`，称为***子类对象字段***，还需实现***父类成员方法***，实现逻辑为将本身指针返回。
 
 ***抽象类***必须具有一个构造器函数，声明方式：名称格式为`Extend<类名>`，创建并返回***抽象成员***指针，参数列表首个参数为***抽象接口***，用于初始化***子类对象***，其他参数根据实际需要自定。
 
@@ -30,7 +30,7 @@
 // 抽象接口
 type I_Vehicle interface {
     // 父类成员方法
-    MVehicle() *M_Vehicle
+    M_Vehicle_() *M_Vehicle
 }
 
 // 抽象成员
@@ -40,7 +40,7 @@ type M_Vehicle struct {
 }
 
 // 实现父类成员方法，返回本身指针
-func (this *M_Vehicle) MVehicle() *M_Vehicle {
+func (this *M_Vehicle) M_Vehicle_() *M_Vehicle {
     return this
 }
 
@@ -69,14 +69,14 @@ func ExtendVehicle(i I_Vehicle) *M_Vehicle {
 
 type I_Aircraft interface {
     I_Vehicle // 继承抽象类Vehicle
-    MAircraft() *M_Aircraft
+    M_Aircraft_() *M_Aircraft
 }
 
 type M_Aircraft struct {
     I I_Aircraft
 }
 
-func (this *M_Aircraft) MAircraft() *M_Aircraft {
+func (this *M_Aircraft) M_Aircraft_() *M_Aircraft {
     return this
 }
 
@@ -171,14 +171,14 @@ import "fmt"
 
 // 类A
 type I_A interface {
-    MA() *M_A
+    M_A_() *M_A
 }
 
 type M_A struct {
     I I_A
 }
 
-func (this *M_A) MA() *M_A {
+func (this *M_A) M_A_() *M_A {
     return this
 }
 
@@ -193,14 +193,14 @@ func ExtendA(i I_A) *M_A {
 // 类B
 type I_B interface {
     I_A // 继承类A
-    MB() *M_B
+    M_B_() *M_B
 }
 
 type M_B struct {
     I I_B
 }
 
-func (this *M_B) MB() *M_B {
+func (this *M_B) M_B_() *M_B {
     return this
 }
 
@@ -215,14 +215,14 @@ func ExtendB(i I_B) *M_B {
 // 类C
 type I_C interface {
     I_A // 继承类A
-    MC() *M_C
+    M_C_() *M_C
 }
 
 type M_C struct {
     I I_C
 }
 
-func (this *M_C) MC() *M_C {
+func (this *M_C) M_C_() *M_C {
     return this
 }
 
@@ -305,7 +305,7 @@ func NewHelicopter() *Helicopter {
 
 ```go
 type I_Vehicle interface {
-    M_Vehicle() *M_Vehicle
+    M_Vehicle_() *M_Vehicle
     Takeoff() string // 增加此方法
 }
 ```
@@ -351,7 +351,7 @@ package main
 import "fmt"
 
 type I_Car interface {
-    MCar() *M_Car
+    M_Car_() *M_Car
     Speed() int // 声明一个和成员结构相同方法，表示此方法可重写
 }
 
@@ -359,7 +359,7 @@ type M_Car struct {
     I I_Car
 }
 
-func (this *M_Car) MCar() *M_Car {
+func (this *M_Car) M_Car_() *M_Car {
     return this
 }
 
@@ -412,7 +412,7 @@ func main() {
 
     // 通过成员结构调用，可直接调用父类实现的方法。
     for _, c := range cars {
-        fmt.Println(c.M_Car().Speed())
+        fmt.Println(c.M_Car_().Speed())
     }
     // Output:
     // 100

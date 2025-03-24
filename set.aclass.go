@@ -5,7 +5,7 @@ func extendSet[T comparable](i i_Set[T], m i_Map[T, any]) *m_Set[T] {
 }
 
 type i_Set[T comparable] interface {
-	mSet() *m_Set[T]
+	m_Set_() *m_Set[T]
 }
 
 type m_Set[T comparable] struct {
@@ -13,42 +13,42 @@ type m_Set[T comparable] struct {
 	m i_Map[T, any]
 }
 
-func (this *m_Set[T]) mSet() *m_Set[T] {
+func (this *m_Set[T]) m_Set_() *m_Set[T] {
 	return this
 }
 
 func (this *m_Set[T]) Add(es ...T) {
 	for _, e := range es {
-		this.m.mMap().Put(e, struct{}{})
+		this.m.m_Map_().Put(e, struct{}{})
 	}
 }
 
 func (this *m_Set[T]) AddSet(i i_Set[T]) {
-	for k := range i.mSet().m.mMap().m {
-		this.m.mMap().Put(k, struct{}{})
+	for k := range i.m_Set_().m.m_Map_().m {
+		this.m.m_Map_().Put(k, struct{}{})
 	}
 }
 
 func (this *m_Set[T]) Remove(e T) {
-	this.m.mMap().Remove(e)
+	this.m.m_Map_().Remove(e)
 }
 
 func (this *m_Set[T]) Contains(ts ...T) bool {
-	return this.m.mMap().ContainsKeys(ts...)
+	return this.m.m_Map_().ContainsKeys(ts...)
 }
 
 func (this *m_Set[T]) ContainsAny(ts ...T) bool {
-	return this.m.mMap().ContainsAnyKey(ts...)
+	return this.m.m_Map_().ContainsAnyKey(ts...)
 }
 
 func (this *m_Set[T]) Len() int {
-	return this.m.mMap().Len()
+	return this.m.m_Map_().Len()
 }
 
 func (this *m_Set[T]) Empty() bool {
-	return this.m.mMap().Empty()
+	return this.m.m_Map_().Empty()
 }
 
 func (this *m_Set[T]) Raw() []T {
-	return this.m.mMap().Keys()
+	return this.m.m_Map_().Keys()
 }

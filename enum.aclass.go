@@ -8,7 +8,7 @@ import (
 )
 
 type i_Enum[V i_EnumValue] interface {
-	mEnum() *M_Enum[V]
+	m_Enum_() *M_Enum[V]
 }
 
 type M_Enum[V i_EnumValue] struct {
@@ -16,7 +16,7 @@ type M_Enum[V i_EnumValue] struct {
 	idMap  map[string]V
 }
 
-func (this *M_Enum[V]) mEnum() *M_Enum[V] {
+func (this *M_Enum[V]) m_Enum_() *M_Enum[V] {
 	return this
 }
 
@@ -40,7 +40,7 @@ func (this *M_Enum[V]) OfId(id string) (value V) {
 func (this *M_Enum[V]) OfIdIgnoreCase(id string) (value V) {
 	if this != nil {
 		for _, v := range this.values {
-			if strings.EqualFold(v.mEnumValue().id, id) {
+			if strings.EqualFold(v.m_EnumValue_().id, id) {
 				return v
 			}
 		}
@@ -51,12 +51,12 @@ func (this *M_Enum[V]) OfIdIgnoreCase(id string) (value V) {
 func (this *M_Enum[V]) Is(source V, targets ...V) bool {
 	if this != nil {
 		for _, t := range targets {
-			if source.mEnumValue().Undefined() {
-				if t.mEnumValue().Undefined() {
+			if source.m_EnumValue_().Undefined() {
+				if t.m_EnumValue_().Undefined() {
 					return true
 				}
-			} else if !t.mEnumValue().Undefined() {
-				if t.mEnumValue().id == source.mEnumValue().id {
+			} else if !t.m_EnumValue_().Undefined() {
+				if t.m_EnumValue_().id == source.m_EnumValue_().id {
 					return true
 				}
 			}
@@ -104,17 +104,17 @@ func NewEnum[V i_EnumValue, E i_Enum[V]](e E) E {
 			value = vf.Interface().(V)
 		}
 
-		mEv := value.mEnumValue()
+		mEv := value.m_EnumValue_()
 		mEv.id = tf.Name
 
-		mE := e.mEnum()
+		mE := e.m_Enum_()
 		mE.values = append(mE.values, value)
 	}
 
-	mE := e.mEnum()
+	mE := e.m_Enum_()
 	mE.idMap = make(map[string]V, len(mE.values))
 	for _, value := range mE.values {
-		mE.idMap[value.mEnumValue().id] = value
+		mE.idMap[value.m_EnumValue_().id] = value
 	}
 
 	return v.Interface().(E)
