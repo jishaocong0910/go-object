@@ -20,6 +20,7 @@ func (this *M_Enum[V]) m_Enum_() *M_Enum[V] {
 	return this
 }
 
+// Values 获取所有枚举值
 func (this *M_Enum[V]) Values() []V {
 	var result []V
 	if this != nil {
@@ -28,6 +29,13 @@ func (this *M_Enum[V]) Values() []V {
 	return result
 }
 
+// Undefined 获取一个未定义的枚举值
+func (this *M_Enum[V]) Undefined() V {
+	var v V
+	return v
+}
+
+// OfId 根据ID查找枚举值
 func (this *M_Enum[V]) OfId(id string) (value V) {
 	if this != nil {
 		if v, ok := this.idMap[id]; ok {
@@ -37,6 +45,7 @@ func (this *M_Enum[V]) OfId(id string) (value V) {
 	return
 }
 
+// OfIdIgnoreCase 根据ID查找枚举值，不区分大小写
 func (this *M_Enum[V]) OfIdIgnoreCase(id string) (value V) {
 	if this != nil {
 		for _, v := range this.values {
@@ -48,6 +57,7 @@ func (this *M_Enum[V]) OfIdIgnoreCase(id string) (value V) {
 	return
 }
 
+// Is 判断是否存在指定枚举值
 func (this *M_Enum[V]) Is(source V, targets ...V) bool {
 	if this != nil {
 		for _, t := range targets {
@@ -65,6 +75,7 @@ func (this *M_Enum[V]) Is(source V, targets ...V) bool {
 	return false
 }
 
+// Not 与Is方法相反
 func (this *M_Enum[V]) Not(source V, targets ...V) bool {
 	return !this.Is(source, targets...)
 }
