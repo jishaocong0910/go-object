@@ -61,14 +61,8 @@ func (this *M_Enum[V]) OfIdIgnoreCase(id string) (value V) {
 func (this *M_Enum[V]) Is(source V, targets ...V) bool {
 	if this != nil {
 		for _, t := range targets {
-			if source.m_EnumValue_().Undefined() {
-				if t.m_EnumValue_().Undefined() {
-					return true
-				}
-			} else if !t.m_EnumValue_().Undefined() {
-				if t.m_EnumValue_().id == source.m_EnumValue_().id {
-					return true
-				}
+			if t.m_EnumValue_().ID() == source.m_EnumValue_().ID() {
+				return true
 			}
 		}
 	}
