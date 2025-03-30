@@ -8,108 +8,210 @@
 
 # 类
 
-**go-object风格**中类只有两种：抽象类和非抽象类，抽象类只能被继承不能单独创建，非抽象类则相反。和其他面相对象语言不同，没有即可以被继承又可以单独创建的类。 其规则所提及的所有接口、结构体、函数、字段和方法等，没有强制是否暴露，可根据实际需要选择首字母的大小写。方法接受者使用指针，并且名称统一为`this`。
-
-建议使用单独文件声明类以区分普通Go代码，文件名格式为，抽象类：`<类名>.aclass.go`，非抽象类`<类名>.class.go`。
+**go-object风格**中类只有两种：抽象类和非抽象类，抽象类只能被继承不能单独创建，非抽象类则相反。
 
 ## 抽象类
 
-***抽象类***由***抽象接口***和***抽象成员***组成，***抽象接口***是一个接口，***抽象成员***是一个结构体，它们是一个整体相辅相成。
+***抽象类***由***抽象接口***和***抽象结构***组成，***抽象接口***是一个接口，***抽象结构***是一个结构体，它们是一个整体相辅相成。
 
-***抽象接口***是**抽象类**的代表，多态关系的父类表现形式（go-object风格的多态关系实际为Golang接口的实现关系），还用于声明子类必须实现的方法和可重写方法。声明方式：名称格式为`I_<类名>`，必须声明一个用于转化为***抽象成员***的方法，称为***父类成员方法***，名称格式为：`M_<类名>_`，无参数，返回***抽象成员***指针。
+***抽象接口***是**抽象类**的代表，多态关系的父类表现形式，还用于声明子类必须实现的方法和可重写方法。***抽象接口***的声明规则：名称格式为`I_<类名>`，必须声明一个用于转化为***抽象结构***的方法，称为***父类成员方法***，名称格式为：`M_<类名>_`，无参数，返回***抽象结构***指针。
 
-***抽象成员***用于存放**抽象类**的成员变量和方法，即使没有成员变量或方法，也需要定义它，方便以后扩展。声明方式：名称格式为`M_<类名>`（与***父类成员方法***相差一个下划线，原因是避免编译错误），必须声明一个***抽象接口***的字段`I`，称为***子类对象字段***，还需实现***父类成员方法***，实现逻辑为将本身指针返回。
+***抽象结构***用于存放**抽象类**的成员字段和方法，即使没有成员字段或方法，也需要定义它，方便以后扩展。***抽象结构***的声明规则：名称格式为`M_<类名>`（与***父类成员方法***相差一个下划线，原因是避免编译错误），必须声明一个***抽象接口***的字段`I`，称为***子类对象字段***，还需实现***父类成员方法***，实现逻辑为将本身指针返回。
 
-***抽象类***必须具有一个构造器函数，声明方式：名称格式为`Extend<类名>`，创建并返回***抽象成员***指针，参数列表首个参数为***抽象接口***，用于初始化***子类对象***，其他参数根据实际需要自定。
-
-*抽象类最小代码*
+*Biology抽象类*
 
 ```go
-// vehicle.aclass.go
+// biology.aclass.go
 
 // 抽象接口
-type I_Vehicle interface {
+type I_Biology interface {
     // 父类成员方法
-    M_Vehicle_() *M_Vehicle
+    M_Biology_() *M_Biology
 }
 
-// 抽象成员
-type M_Vehicle struct {
+// 抽象结构
+type M_Biology struct {
     // 子类对象字段
-    I I_Vehicle
+    I I_Biology
+    // 其他成员字段
+    Name string
 }
 
 // 实现父类成员方法，返回本身指针
-func (this *M_Vehicle) M_Vehicle_() *M_Vehicle {
+func (this *M_Biology) M_Biology_() *M_Biology {
     return this
 }
 
-// 构造器
-func ExtendVehicle(i I_Vehicle) *M_Vehicle {
-    return &M_Vehicle{I: i}
+// 其他成员方法
+func (this *M_Biology) Breathe() {
+    fmt.Println("I'm breathing.")
 }
 ```
-
-# 继承
-
-## 继承规则
-
-- ***抽象类***继承***抽象类***，通过***抽象接口***内嵌另一个***抽象接口***方式实现，可多继承。
-- ***非抽象类***继承***抽象类***，通过内嵌***抽象成员***指针方式方式实现，可多继承。
-- <font color=Red>***非抽象类***多继承***抽象类***时，须内嵌每一级***抽象类***的***抽象成员***，而非只内嵌上一级。</font>
 
 ## 非抽象类
 
-非抽象类的形式仅是一个简单的结构体。它必须具有一个构造函数，名称格式为`New<类名>`，无必要构造参数，根据实际情况自定，返回类的结构体指针。构造基本逻辑是，先创建本类的对象（本结构体指针），再调用抽象类的构造函数，首个参数传入本类对象，其他参数根据实际需要传值，创建的变量用来初始化自身内嵌的***抽象成员***。
+***非抽象类***非常简单，它形式仅是一个简单的结构体。
 
-*抽象类继承抽象类*
+# 继承
+
+**go-object风格**的继承遵循以下规则。
+
+1. ***抽象类***继承***抽象类***，通过***抽象接口***内嵌另一个***抽象接口***方式实现，可多继承。
+2. ***非抽象类***继承***抽象类***，通过内嵌***抽象结构***指针方式方式实现，可多继承。
+3. <font color=Red>***非抽象类***继承的***抽象类***具有父类时，***非抽象类***必须内嵌这些父类的***抽象结构***。</font>
+
+*Animal继承Biology（抽象类继承抽象类）*
 
 ```go
-// aircraft.aclass.go
+// animal.aclass.go
 
-type I_Aircraft interface {
-    I_Vehicle // 继承抽象类Vehicle
-    M_Aircraft_() *M_Aircraft
+type I_Animal interface {
+    // 内嵌Biology的抽象接口
+    I_Biology
+    // 父类成员方法
+    M_Animal_() *M_Animal
+    // 声明子类须实现的方法
+    Eat() bool
 }
 
-type M_Aircraft struct {
-    I I_Aircraft
+type M_Animal struct {
+    I I_Animal
 }
 
-func (this *M_Aircraft) M_Aircraft_() *M_Aircraft {
+func (this *M_Animal) M_Animal_() *M_Animal {
+    return this
+}
+```
+
+*Cat继承Biology（非抽象类继承顶级抽象类）*
+
+```go
+// cat.class.go
+
+type Cat struct {
+    *M_Biology // 内嵌Biology的抽象结构
+}
+```
+
+*Bird继承Animal（非抽象类继承非顶级抽象类）*
+
+```go
+// bird.class.go
+
+type Bird struct {
+    *M_Biology // 内嵌Biology的抽象结构
+    *M_Animal  // 内嵌Animal的抽象结构 
+    canSwin bool
+}
+
+// 实现父类的方法
+func (this *Bird) Eat() {
+    fmt.Println("I'm eating")
+}
+
+func (this *Bird) Swim() {
+    if this.canSwim {
+        fmt.Println("I'm swimming.")
+    } else {
+        fmt.Println("I can't swim.")
+    }
+}
+```
+
+> [!CAUTION]
+> 
+> 以下方式是不合法的，Animal不是顶级父类，其继承的父类的抽象结构也需要内嵌。
+> 
+> ```go
+> type Bird struct {
+>   *M_Animal // 只内嵌Animal的抽象结构是不够的
+> }
+> ```
+> 
+
+# 构造器
+
+所有类都必须具有构造器，构造器是一个函数，***抽象类***和***非抽象类***规则不同。
+
+## 抽象类构造器
+
+***抽象类***构造器声明规则：名称格式为`Extend<类名>`，创建并返回***抽象结构***指针，参数列表首个参数为***抽象接口***，用于初始化***子类对象***，其他参数根据实际需要自定。
+
+*Biology类完整声明*
+
+```go
+// biology.aclass.go
+
+type I_Biology interface {
+    M_Biology_() *M_Biology
+}
+
+type M_Biology struct {
+    I I_Biology
+    Name string
+}
+
+func (this *M_Biology) M_Biology_() *M_Biology {
     return this
 }
 
-func ExtendAircraft(i I_Aircraft) *M_Aircraft {
-    return &M_Aircraft{I: i}
+func (this *M_Biology) Breathe() {
+    return "I'm breathing"
+}
+
+// 构造器，首个参数为抽象接口，其他参数根据实际需要补充
+func ExtendBiology(i I_Biology, name string) *M_Biology {
+    return &M_Biology{I: i, Name: name}
 }
 ```
 
-*非抽象类的继承与构造器*
+## 非抽象类构造器
+
+***非抽象类***构造器声明规则：名称格式为`New<类名>`，无必要构造参数，根据实际需要自定，返回类的结构体指针。构造基本逻辑是，先创建本类的对象（本结构体指针），再调用抽象类的构造函数，首个参数传入本类对象，其他参数根据实际需要传值，创建的变量用来初始化自身内嵌的***抽象结构***。
+
+*Bird类完整声明*
 
 ```go
-// helicopter.class.go
+// bird.class.go
 
-type Helicopter struct {
-    // 内嵌每一级父类的成员结构，而非只继承上级父类
-    *M_Vehicle  
-    *M_Aircraft
+type Bird struct {
+    *M_Biology
+    *M_Animal
+    canSwin bool
 }
 
-// 构造器
-func NewHelicopter() *Helicopter {
-	// 先创建本类对象
-    c := &Helicopter{}
-    // 使用对应的抽象类的构造器，初始化所有内嵌抽象成员。
-    c.M_Vehicle = ExtendVehicle(c)
-    c.M_Aircraft = ExtendAircraft(c)
-    return c
+func (this *Bird) Eat() {
+    fmt.Println("I'm eating")
+}
+
+func (this *Bird) Swim() {
+    if this.canSwim {
+        fmt.Println("I'm swimming.")
+    } else {
+        fmt.Println("I can't swim.")
+    }
+}
+
+// 构造器，无必要参数，根据实际需要自定
+func NewBird(name string, canSwim bool) *Bird {
+    // 先创建本类对象
+    b := &Bird{canSwim: canSwim}
+    // 初始化所有内嵌抽象结构。
+    b.M_Biology = ExtendBiology(b, name)
+    b.M_Animal = ExtendAnimal(b)
+    return b
 }
 ```
 
-## 多继承二义性
+# 类声明的其他规则
 
-多继承一般都会产生二义性问题，其中一个常见的场景：所有类的方法都不相同，但子类继承的多个父类又继承了相同父类，导致出现二义性问题，例如B和C继承了A，D继承B和C，D调用A的方法时出现二义性问题。
+- 类的名称、字段、方法和构造器等等，都没有强制是否暴露，可根据实际需要选择首字母的大小写。例如抽象类只在包内使用，抽象接口和抽象结构可命名为`i_<类名>`和`m_<类名>`。
+- 方法接受者使用指针，统一名称为`this`。
+- 使用单独文件声明类，以区分普通Go代码，文件名格式为，抽象类：`<类名>.aclass.go`，非抽象类：`<类名>.class.go`。
+
+# 多继承二义性
+
+多继承一般都会产生二义性问题，常见的场景：子类继承的多个父类又继承了相同父类，导致出现二义性问题。例如B和C继承了A，D继承B和C，D调用A的方法时出现二义性问题。
 
 *C++多继承二义性*
 
@@ -160,7 +262,9 @@ int main()
 }
 ```
 
-**go-object风格**解决了这种场景的二义性问题，因为在它的规则中，***抽象类***之间的继承只是将***抽象接口***进行内嵌，***抽象成员***则没有，所以并不会拷贝父类的成员方法，因此不会产生二义性，并且由于继承规则的最后一条，子类必须继承每一级父类，也就是内嵌每一级的***抽象成员***，所以保证子类会拥有所有父类的成员方法。现在我们用**go-object风格**来改写上面的C++例子。
+**go-object风格**消除了这种场景的二义性问题，因为在它的规则中，***抽象类***之间的继承只内嵌***抽象接口***，没有内嵌***抽象结构***，也就不会拷贝父类的成员字段和方法，所以不会产生二义性。***抽象结构***是在子类中进行内嵌的，根据继承规则，子类内嵌了每一级父类，所以保证子类会拥有所有父类的成员字段和方法。
+
+现在我们用**go-object风格**来改写上面的C++例子。
 
 *go-object风格改写*
 
@@ -263,63 +367,133 @@ func main() {
 }
 ```
 
-# 编译约束
+# 中间类
 
-**go-object风格**是一种自我约定的代码风格，没有编译器的天然约束，但它的一些规则具有Golang的语法约束。
+即可以被继承，又可以实例化的类，在**go-object**风格中称为***中间类***。尽管**go-object**风格没有***中间类***的声明方式，但还是能变通实现。
 
-## 子类必须内嵌所有父类的抽象结构
+## 使抽象类实例化
 
-即继承规则的最后一条。
+为***抽象类***增加一个相同类名的子类，并且没有其他成员字段和方法，那么这个子类相当于可实例化的***抽象类***。从类名上看，***抽象类***为`I_<类名>`和`M_<类名>`，子类为`<类名>`，从文件名上看，***抽象类***为`<类名>.aclass.go`，子类为`<类名>.class.go`，命名都不冲突，并且容易看出两者之间的关系。
 
-*错误写法*
+*Biology类改为可实例化*
 ```go
-type Helicopter struct {
-    *M_Aircraft // 只内嵌直接上级父类的成员结构
+// biology.class.go
+
+type Biology struct {
+    *M_Biology
 }
 
-func NewHelicopter() *Helicopter {
-    c := &Helicopter{}
-    c.M_Aircraft = ExtendAircraft(c) // some methods are missing: M_Vehicle() *M_Vehicle
-    return c
+func NewBiology(name string) *Biology {
+    b := &Biology{}
+    b.M_Biology = ExtendBiology(b, name)
 }
 ```
 
-*正确写法*
+## 使非抽象类可继承
+
+和抽象类实例化原理相同，将***非抽象类***改造为***抽象类***，再增加可实例化它的子类。
+
+*Bird类改为可继承*
+
 ```go
-type Helicopter struct {
-    *M_Vehicle  
-    *M_Aircraft
+// bird.aclass.go
+
+type I_Bird interface {
+    I_Animal
+    M_Bird_() *M_Bird
 }
 
-func NewHelicopter() *Helicopter {
-    c := &Helicopter{}
-    c.M_Vehicle = ExtendVehicle(c)
-    c.M_Aircraft = ExtendAircraft(c)
-    return c
+type M_Bird struct {
+    I I_Animal
+    canSwim bool
+}
+
+func (this *M_Bird) M_Bird_() *M_Bird {
+    return this
+}
+
+func (this *Bird) Eat() {
+    fmt.Println("I'm eating")
+}
+
+func (this *Bird) Swim() {
+    if this.canSwim {
+        fmt.Println("I'm swimming.")
+    } else {
+        fmt.Println("I can't swim.")
+    }
+}
+
+func ExtendBird(i I_Bird, canSwim bool) *M_Bird {
+    return &M_Bird{I: i, canSwim: canSwim}
+}
+```
+
+```go
+// bird.class.go
+
+type Bird struct {
+    *M_Biology
+    *M_Animal
+    *M_Bird
+}
+
+func NewBird(name string, canSwim bool) *Bird {
+    b := &Bird{}
+    b.M_Biology = ExtendBiology(b, name)
+    b.M_Animal = ExtendAnimal(b)
+    b.M_Bird = ExtendBird(b, canSwim)
+    return b
+}
+```
+
+# 编译器的支持
+
+**go-object风格**是一种自我约定的代码风格，编译器无法检查每一条规则，但一些重要规则还是能得到编译器的支持。
+
+## 子类必须内嵌每一级父类的抽象结构
+
+即继承规则的最后一条。
+
+*Dog只继承Animal将编译错误*
+
+```go
+// dog.class.go
+
+type Dog struct {
+    *M_Animal
+}
+
+func (this *Dog) Eat() {
+    fmt.Println("I'm eating.")
+}
+
+func NewDog() *Dog {
+    d := &Dog{}
+    d.M_Animal = ExtendAnimal(d) // 编译错误：some methods are missing: M_Biology_() *M_Biology
+    return d
 }
 ```
 
 ## 子类必须实现抽象方法
 
-*在抽象接口中增加方法。*
+*Rabbit未实现Animal的方法将编译错误*
 
 ```go
-type I_Vehicle interface {
-    M_Vehicle_() *M_Vehicle
-    Takeoff() string // 增加此方法
-}
-```
-*子类的构造器将会出现编译错误，显示未实现方法。*
+// rabbit.class.go
 
-```go
-func NewHelicopter() *Helicopter {
-    c := &Helicopter{}
-    c.M_Vehicle = ExtendVehicle(c) // some methods are missing: Takeoff() string
-    c.M_Aircraft = ExtendAircraft(c) // some methods are missing: Takeoff() string
-    return c
+type Rabbit struct {
+    *M_Biology
+    *M_Animal
+}
+
+func NewRabbit(name string) *Rabbit {
+    r := &Rabbit{}
+    r.M_Biology = ExtendBiology(r, name)
+    r.M_Animal = ExtendAnimal(r) // 编译错误：some methods are missing: Eat()
+    return r
 }
 ```
-遇到此错误时，子类实现指定方法即可修复。
 
 # 多态
 
@@ -331,92 +505,108 @@ func NewHelicopter() *Helicopter {
 *多态转换*
 
 ```go
-h := NewHelicopter()
-var v I_Vehicle = h  // Helicopter转Vehicle
-var a I_Aircraft = h // Helicopter转Aircraft
-a = v.(I_Aircraft)   // Vehicle转Aircraft
-h = v.(*Helicopter)  // Vehicle转Helicopter
-v = a                // Aircraft转Vehicle
-v = a.(*Helicopter)  // Aircraft转Helicopter
+bd := NewBird()
+var b I_Biology = bd  // Bird转Biology
+var a I_Animal = bd   // Bird转Animal
+a = b.(I_Animal)      // Biology转Animal
+bd = b.(*Bird)        // Biology转Bird
+b = a                 // Animal转Biology
+bd = a.(*Bird)        // Animal转Bird
 ```
 
 # 方法重写
 
-方法的重写，即子类重写父类的方法，**go-object风格**的规则是，重写的方法应该也在***抽象接口***中声明。
+方法的重写规则：***抽象类***可重写的方法在***抽象接口***和***抽象结构***都需要声明。
 
-*方法重写例子*
+*Plant类声明可重写方法*
+
 ```go
-package main
+// plant.aclass.go
 
-import "fmt"
-
-type I_Car interface {
-    M_Car_() *M_Car
-    Speed() int // 声明一个和成员结构相同方法，表示此方法可重写
+type I_Plant interface {
+    M_Plant_() *Plant
+    Say() // 声明抽象结构的方法，使其可重写
 }
 
-type M_Car struct {
-    I I_Car
+type M_Plant struct {
+    I I_Plant
 }
 
-func (this *M_Car) M_Car_() *M_Car {
+func (this *M_Plant) M_Plant_() *M_Plant {
     return this
 }
 
-func (this *M_Car) Speed() int {
-    return 100
+// 在抽象接口也声明此方法，使其可重写
+func (this *M_Plant) Say() {
+    fmt.Println("I'm a plant.")
 }
 
-func ExtendCar(i I_Car) *M_Car {
-  return &M_Car{I: i}
+func ExtendPlant(i I_Plant) *M_Plant {
+    return &M_Bird{I: i}
+}
+```
+
+*Tree类*
+
+```go
+// tree.class.go
+
+type Tree struct {
+    *M_Plant
 }
 
-// 重写父类方法的子类
-type Jeep struct {
-    *M_Car
+func NewTree() *Tree {
+    t := &Tree{}
+    t.M_Plant = ExtendPlant(t)
+    return t
+} 
+
+```
+
+*Flower类*
+
+```go
+// flower.class.go
+
+type Flower struct {
+    *M_Plant
 }
 
-func (this *Jeep) Speed() int {
-    return 200
+func (this *M_Plant) Say() {
+    fmt.Println("I'm a flower.")
 }
 
-func NewJeep() *Jeep {
-  j := &Jeep{}
-  j.M_Car = ExtendCar(j)
-  return j
-}
+func NewFlower() *Flower {
+    f := &Flower{}
+    f.M_Plant = ExtendPlant(f)
+    return f
+} 
 
-// 没有重写父类方法的子类
-type Trucks struct {
-    *M_Car
-}
+```
 
-func NewTrucks() *Trucks {
-  t := &Trucks{}
-  t.M_Car = ExtendCar(t)
-  return t
-}
+*重写方法的调用*
 
+```go
 func main() {
-    j := NewJeep()
-    t := NewTrucks()
-    cars := []I_Car{j, t}
+    t := NewTree()
+    f := NewFlower()
+    ps := []I_Plant{t, f}
 
     // 通过抽象接口调用，将调用子类重写的方法，如果子类没有重写则调用父类方法。
-    for _, c := range cars {
-        fmt.Println(c.Speed())
+    for _, p := range ps {
+        fmt.Println(b.Say())
     }
     // Output:
-    // 200
-    // 100
+    // I'm a plant.
+    // I'm a flower.
 
-    // 通过成员结构调用，可直接调用父类实现的方法。
-    for _, c := range cars {
-        fmt.Println(c.M_Car_().Speed())
+    // 子类可通过抽象结构调用父类实现的方法。
+	for _, p := range ps {
+        fmt.Println(b.M_Plant_().Say())
     }
     // Output:
-    // 100
-    // 100
+    // I'm plant.
+    // I'm plant.
 }
 ```
 
@@ -436,8 +626,8 @@ func main() {
 
 | 方法        | 说明                     |
 |-----------|------------------------|
-| Id        | 在枚举集合中的ID，值为在枚举集合的字段名。 |
-| Undefined | 返回该枚举值是否存在。            |
+| ID        | 在枚举集合中的ID，值为在枚举集合的字段名。 |
+| Undefined | 返回该枚举值是否未定义。           |
 
 *o.M_Enum方法*
 
@@ -529,7 +719,7 @@ func main() {
 >
 > 枚举功能虽然采用**go-object风格**实现，但是对一些规则做了优化：内嵌枚举值和枚举集合抽象类的结构体，不被视为“类”，它们以变量值形式存在而非指针，因此不推荐方法接受者使用指针、名称使用`this`。优化原因有以下几点：
 >
-> - 枚举信息应该是只读的，所以用值表示而非指针。
+> - 枚举应该是只读的，所以用值表示而非指针。
 > - 枚举集合多用来访问其字段（枚举值）而非传值，值类型比指针访问字段更快。
 
 # 判断NULL
