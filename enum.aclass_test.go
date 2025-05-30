@@ -8,7 +8,7 @@ import (
 )
 
 type Animal struct {
-	*M_EnumValue
+	*M_EnumElem
 }
 
 func TestEnum(t *testing.T) {
@@ -38,7 +38,7 @@ func TestEnum(t *testing.T) {
 	r.True(enum.OfId("BIRD").Undefined())
 	r.False(enum.OfIdIgnoreCase("BIRD").Undefined())
 
-	values := enum.Values()
+	values := enum.Elems()
 	r.Len(values, 3)
 
 	a := Animal{}

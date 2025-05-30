@@ -612,9 +612,9 @@ func main() {
 
 # 枚举
 
-本项目用**go-object风格**设计了枚举功能。声明枚举需要创建枚举值和枚举集合两个结构体，枚举值内嵌`*o.M_EnumValue`，枚举集合内嵌`*o.M_Enum`并指定泛型类型为枚举值的类型，再通过`o.NewEnum`函数创建枚举集合变量。
+本项目用**go-object风格**设计了枚举功能。声明枚举需要创建枚举值和枚举集合两个结构体，枚举值内嵌`*o.M_EnumElem`，枚举集合内嵌`*o.M_Enum`并指定泛型类型为枚举值的类型，再通过`o.NewEnum`函数创建枚举集合变量。
 
-枚举集合的名称建议使用格式`_<枚举值名>`，因为实践中它基本不会暴露给包外。
+枚举值名称建议为`<枚举名>_`，枚举集合名称建议为`_<枚举名>`。
 
 枚举值和枚举集合都不需要构造函数，`o.NewEnum`函数已包装了统一逻辑。
 
@@ -622,7 +622,7 @@ func main() {
 
 建议使用单独文件声明枚举以区分普通Go代码，枚举值和枚举集合都在统一文件，文件名格式为`<枚举名>.enum.go`。
 
-*o.M_EnumValue方法*
+*o.M_EnumElem方法*
 
 | 方法        | 说明                     |
 |-----------|------------------------|
@@ -633,7 +633,7 @@ func main() {
 
 | 方法             | 说明                                                                 |
 |----------------|--------------------------------------------------------------------|
-| Values         | 所有枚举值，一般用于自定义枚举查找。                                                 |
+| Elems           | 所有枚举值，一般用于自定义枚举查找。                                                 |
 | Undefined      | 返回一个未定义的枚举值。                                                       |
 | OfId           | 根据ID查找枚举值，ID为枚举字段名称。                                               |
 | OfIdIgnoreCase | 根据ID查找枚举值，不区分大小写。                                                  |
@@ -652,20 +652,20 @@ import (
 )
 
 // 枚举值
-type DbType struct {
-    *o.M_EnumValue // 内嵌*o.M_EnumValue
-    Name           string
+type DbType_ struct {
+    *o.M_EnumElem // 内嵌*o.M_EnumElem
+    Name         string
 }
 
 // 枚举集合
 type _DbType struct {
-    *o.M_Enum[DbType]                  // 内嵌*o.M_Enum
-    MYSQL, ORACLE, SQLSERVER, POSTFRES DbType
+    *o.M_Enum[DbType_]                 // 内嵌*o.M_Enum
+    MYSQL, ORACLE, SQLSERVER, POSTFRES DbType_
 }
 
 // 自定义查找方法（接受者不需要指针，名称不需要为this）
-func (d _DbType) OfName(name string) (result DbType) {
-    for _, t := range d.Values() {
+func (d _DbType) OfName(name string) (result DbType_) {
+    for _, t := range d.Elems() {
         if t.Name == name {
             result = t
             break
@@ -675,11 +675,11 @@ func (d _DbType) OfName(name string) (result DbType) {
 }
 
 // 创建枚举集合变量，并初始化每个枚举值
-var DbTypes = o.NewEnum[DbType](_DbType{
-    MYSQL:     DbType{Name: "MySQL"},
-    ORACLE:    DbType{Name: "Oracle"},
-    SQLSERVER: DbType{Name: "SQLserver"},
-    POSTFRES:  DbType{Name: "PostgreSQL"},
+var DbTypes = o.NewEnum[DbType_](_DbType{
+    MYSQL:     DbType_{Name: "MySQL"},
+    ORACLE:    DbType_{Name: "Oracle"},
+    SQLSERVER: DbType_{Name: "SQLserver"},
+    POSTFRES:  DbType_{Name: "PostgreSQL"},
 })
 
 func main() {

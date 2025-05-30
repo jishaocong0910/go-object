@@ -7,49 +7,49 @@ import (
 	"unsafe"
 )
 
-type i_Enum[V i_EnumValue] interface {
-	m_Enum_() *M_Enum[V]
+type i_Enum[E i_EnumElem] interface {
+	m_Enum_() *M_Enum[E]
 }
 
-type M_Enum[V i_EnumValue] struct {
-	values []V
-	idMap  map[string]V
+type M_Enum[E i_EnumElem] struct {
+	elems []E
+	idMap map[string]E
 }
 
-func (this *M_Enum[V]) m_Enum_() *M_Enum[V] {
+func (this *M_Enum[E]) m_Enum_() *M_Enum[E] {
 	return this
 }
 
-// Values 获取所有枚举值
-func (this *M_Enum[V]) Values() []V {
-	var result []V
+// Elems 获取所有枚举值
+func (this *M_Enum[E]) Elems() []E {
+	var result []E
 	if this != nil {
-		result = this.values
+		result = this.elems
 	}
 	return result
 }
 
 // Undefined 获取一个未定义的枚举值
-func (this *M_Enum[V]) Undefined() V {
-	var v V
+func (this *M_Enum[E]) Undefined() E {
+	var v E
 	return v
 }
 
 // OfId 根据ID查找枚举值
-func (this *M_Enum[V]) OfId(id string) (value V) {
+func (this *M_Enum[E]) OfId(id string) (e E) {
 	if this != nil {
 		if v, ok := this.idMap[id]; ok {
-			value = v
+			e = v
 		}
 	}
 	return
 }
 
 // OfIdIgnoreCase 根据ID查找枚举值，不区分大小写
-func (this *M_Enum[V]) OfIdIgnoreCase(id string) (value V) {
+func (this *M_Enum[E]) OfIdIgnoreCase(id string) (e E) {
 	if this != nil {
-		for _, v := range this.values {
-			if strings.EqualFold(v.m_EnumValue_().id, id) {
+		for _, v := range this.elems {
+			if strings.EqualFold(v.m_EnumElem_().id, id) {
 				return v
 			}
 		}
@@ -58,10 +58,10 @@ func (this *M_Enum[V]) OfIdIgnoreCase(id string) (value V) {
 }
 
 // Is 判断是否存在指定枚举值
-func (this *M_Enum[V]) Is(source V, targets ...V) bool {
+func (this *M_Enum[E]) Is(source E, targets ...E) bool {
 	if this != nil {
 		for _, t := range targets {
-			if t.m_EnumValue_().ID() == source.m_EnumValue_().ID() {
+			if t.m_EnumElem_().ID() == source.m_EnumElem_().ID() {
 				return true
 			}
 		}
@@ -70,11 +70,11 @@ func (this *M_Enum[V]) Is(source V, targets ...V) bool {
 }
 
 // Not 与Is方法相反
-func (this *M_Enum[V]) Not(source V, targets ...V) bool {
+func (this *M_Enum[E]) Not(source E, targets ...E) bool {
 	return !this.Is(source, targets...)
 }
 
-func NewEnum[V i_EnumValue, E i_Enum[V]](e E) E {
+func NewEnum[E i_EnumElem, ES i_Enum[E]](e ES) ES {
 	t := reflect.TypeOf(e)
 	v := reflect.ValueOf(e)
 	if t.Kind() == reflect.Pointer {
@@ -82,8 +82,8 @@ func NewEnum[V i_EnumValue, E i_Enum[V]](e E) E {
 	}
 	t = reflect.TypeOf(&e).Elem()
 	v = reflect.ValueOf(&e).Elem()
-	expectedType := reflect.TypeOf((*V)(nil)).Elem()
-	v.FieldByName("M_Enum").Set(reflect.ValueOf(&M_Enum[V]{}))
+	expectedType := reflect.TypeOf((*E)(nil)).Elem()
+	v.FieldByName("M_Enum").Set(reflect.ValueOf(&M_Enum[E]{}))
 
 	for i := 0; i < v.NumField(); i++ {
 		tf := t.Field(i)
@@ -99,28 +99,28 @@ func NewEnum[V i_EnumValue, E i_Enum[V]](e E) E {
 			panic(fmt.Sprintf("%s.%s must not be a pointer type", t.String(), tf.Name))
 		}
 
-		var value V
-		evField := vf.FieldByName("M_EnumValue")
+		var elem E
+		evField := vf.FieldByName("M_EnumElem")
 		if !tf.IsExported() {
-			reflect.NewAt(evField.Type(), unsafe.Pointer(evField.UnsafeAddr())).Elem().Set(reflect.ValueOf(&M_EnumValue{}))
-			value = reflect.NewAt(vf.Type(), unsafe.Pointer(vf.UnsafeAddr())).Elem().Interface().(V)
+			reflect.NewAt(evField.Type(), unsafe.Pointer(evField.UnsafeAddr())).Elem().Set(reflect.ValueOf(&M_EnumElem{}))
+			elem = reflect.NewAt(vf.Type(), unsafe.Pointer(vf.UnsafeAddr())).Elem().Interface().(E)
 		} else {
-			evField.Set(reflect.ValueOf(&M_EnumValue{}))
-			value = vf.Interface().(V)
+			evField.Set(reflect.ValueOf(&M_EnumElem{}))
+			elem = vf.Interface().(E)
 		}
 
-		mEv := value.m_EnumValue_()
+		mEv := elem.m_EnumElem_()
 		mEv.id = tf.Name
 
 		mE := e.m_Enum_()
-		mE.values = append(mE.values, value)
+		mE.elems = append(mE.elems, elem)
 	}
 
 	mE := e.m_Enum_()
-	mE.idMap = make(map[string]V, len(mE.values))
-	for _, value := range mE.values {
-		mE.idMap[value.m_EnumValue_().id] = value
+	mE.idMap = make(map[string]E, len(mE.elems))
+	for _, elem := range mE.elems {
+		mE.idMap[elem.m_EnumElem_().id] = elem
 	}
 
-	return v.Interface().(E)
+	return v.Interface().(ES)
 }
