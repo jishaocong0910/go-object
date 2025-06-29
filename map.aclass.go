@@ -55,8 +55,18 @@ func (this *m_Map[K, V]) GetIfAbsent(k K, f func(k K) V) (v V) {
 	return
 }
 
-func (this *m_Map[K, V]) Remove(k K) {
-	delete(this.m, this.i.key(k))
+func (this *m_Map[K, V]) Remove(k K) bool {
+	if _, ok := this.m[k]; ok {
+		delete(this.m, this.i.key(k))
+		return true
+	}
+	return false
+}
+
+func (this *m_Map[K, V]) RemoveAll(ks ...K) {
+	for _, k := range ks {
+		delete(this.m, this.i.key(k))
+	}
 }
 
 func (this *m_Map[K, V]) ContainsKeys(ks ...K) bool {
@@ -78,11 +88,19 @@ func (this *m_Map[K, V]) ContainsAnyKey(ks ...K) bool {
 }
 
 func (this *m_Map[K, V]) Keys() []K {
-	var keys []K
-	for _, v := range this.m {
-		keys = append(keys, v.Key)
+	keys := make([]K, 0, len(this.m))
+	for _, e := range this.m {
+		keys = append(keys, e.Key)
 	}
 	return keys
+}
+
+func (this *m_Map[K, V]) Values() []V {
+	values := make([]V, 0, len(this.m))
+	for _, e := range this.m {
+		values = append(values, e.Value)
+	}
+	return values
 }
 
 func (this *m_Map[K, V]) Len() int {
@@ -95,10 +113,16 @@ func (this *m_Map[K, V]) Empty() bool {
 
 func (this *m_Map[K, V]) Raw() map[K]V {
 	raw := make(map[K]V, len(this.m))
-	for _, v := range this.m {
-		raw[v.Key] = v.Value
+	for _, e := range this.m {
+		raw[e.Key] = e.Value
 	}
 	return raw
+}
+
+func (this *m_Map[K, V]) Range(f func(k K, v V)) {
+	for _, e := range this.m {
+		f(e.Key, e.Value)
+	}
 }
 
 type Entry[K comparable, V any] struct {

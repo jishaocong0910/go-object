@@ -40,7 +40,7 @@ func TestStrKeyMap(t *testing.T) {
 	m2.PutAll(m3)
 	r.Equal(2, m2.Len())
 
-	toMap := m3.Raw()
+	toMap := m3.Range()
 	r.Equal(3, len(toMap))
 	toMap["aaa"] = "111"
 	toMap["Aaa"] = "222"
